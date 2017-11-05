@@ -5,10 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
-import org.test.transfer.model.AccountDetails;
-import org.test.transfer.model.AccountInfoRequest;
-import org.test.transfer.model.CreateAccountRequest;
-import org.test.transfer.service.AccountService;
+import org.test.transfer.model.account.AccountDetails;
+import org.test.transfer.model.account.AccountInfoRequest;
+import org.test.transfer.model.account.CreateAccountRequest;
+import org.test.transfer.service.account.AccountService;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;

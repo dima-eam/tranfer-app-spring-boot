@@ -1,4 +1,4 @@
-package org.test.transfer.model;
+package org.test.transfer.model.account;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -6,16 +6,25 @@ import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.util.Objects;
 
+/**
+ * Immutable account details entity with JSON serialization support.
+ */
 public class AccountDetails {
 
+    /**
+     * Account id
+     */
     @Nonnull
     private final Long id;
+    /**
+     * Account balance
+     */
     @Nonnull
     private final BigDecimal balance;
 
     public AccountDetails(@Nonnull Long id, @Nonnull BigDecimal balance) {
         this.id = Objects.requireNonNull(id, "id");
-        this.balance = balance;
+        this.balance = Objects.requireNonNull(balance, "balance");
     }
 
     @Nonnull

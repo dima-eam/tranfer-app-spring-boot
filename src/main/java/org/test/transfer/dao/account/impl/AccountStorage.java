@@ -1,8 +1,9 @@
-package org.test.transfer.dao;
+package org.test.transfer.dao.account.impl;
 
 import org.springframework.stereotype.Component;
-import org.test.transfer.model.AccountDetails;
-import org.test.transfer.model.TransferDetails;
+import org.test.transfer.dao.account.AccountOperations;
+import org.test.transfer.model.account.AccountDetails;
+import org.test.transfer.model.transfer.TransferDetails;
 
 import javax.annotation.Nonnull;
 import java.math.BigDecimal;
@@ -11,12 +12,22 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+/**
+ * Application data storage and operations implementation.
+ */
 @Component
 public class AccountStorage implements AccountOperations {
 
     private final ConcurrentMap<Long, AccountEntity> storage = new ConcurrentHashMap<>();
     private final AtomicLong idGenerator = new AtomicLong(0);
 
+    /**
+     * Puts data to concurrent map
+     *
+     * @param name    account name
+     * @param balance account initial balance
+     * @return account details
+     */
     @Override
     public AccountDetails store(String name, BigDecimal balance) {
         AccountEntity accountEntity = new AccountEntity(newId(), name, balance);
@@ -24,32 +35,42 @@ public class AccountStorage implements AccountOperations {
         return new AccountDetails(accountEntity.id, accountEntity.balance);
     }
 
+    /**
+     * Checks for account presence and balance then atomically replace accounts with new balances
+     *
+     * @param fromId payer account id
+     * @param toId   payee account id
+     * @param amount amount
+     * @return transfer details
+     */
     @Override
-    public TransferDetails transferAtomically(Long from, Long to, BigDecimal amount) {
-        AccountEntity fromAcc = storage.get(from);
+    public TransferDetails transferAtomically(Long fromId, Long toId, BigDecimal amount) {
+        AccountEntity fromAcc = storage.get(fromId);
         if (fromAcc == null) {
             throw new IllegalArgumentException("Payer account not found");
         }
-        AccountEntity toAcc = storage.get(to);
+
+        AccountEntity toAcc = storage.get(toId);
         if (toAcc == null) {
             throw new IllegalArgumentException("Payee account not found");
         }
+
         if (fromAcc.balance.compareTo(amount) < 0) {
             throw new IllegalArgumentException("Insufficient funds");
         }
 
-        Object lock1 = from.compareTo(to) < 0 ? fromAcc : toAcc;
-        Object lock2 = from.compareTo(to) < 0 ? toAcc : fromAcc;
+        Object lock1 = fromId.compareTo(toId) < 0 ? fromAcc : toAcc;
+        Object lock2 = fromId.compareTo(toId) < 0 ? toAcc : fromAcc;
         synchronized (lock1) {
             synchronized (lock2) {
-                storage.replace(from, fromAcc.subtract(amount));
-                storage.replace(to, toAcc.add(amount));
+                storage.replace(fromId, fromAcc.withdraw(amount));
+                storage.replace(toId, toAcc.deposit(amount));
             }
         }
 
         return new TransferDetails.Builder()
-                .setFromAccountDetails(new AccountDetails(from, fromAcc.balance))
-                .setToAccountDetails(new AccountDetails(to, toAcc.balance))
+                .setFromAccountDetails(new AccountDetails(fromId, fromAcc.balance))
+                .setToAccountDetails(new AccountDetails(toId, toAcc.balance))
                 .build();
     }
 
@@ -63,6 +84,9 @@ public class AccountStorage implements AccountOperations {
         return idGenerator.incrementAndGet();
     }
 
+    /**
+     * Support class representing data layer entities.
+     */
     private static class AccountEntity {
 
         @Nonnull
@@ -78,11 +102,11 @@ public class AccountStorage implements AccountOperations {
             this.balance = balance;
         }
 
-        public AccountEntity subtract(BigDecimal amount) {
+        public AccountEntity withdraw(BigDecimal amount) {
             return new AccountEntity(id, name, balance.subtract(amount));
         }
 
-        public AccountEntity add(BigDecimal amount) {
+        public AccountEntity deposit(BigDecimal amount) {
             return new AccountEntity(id, name, balance.add(amount));
         }
     }

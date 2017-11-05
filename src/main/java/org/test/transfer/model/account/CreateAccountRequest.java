@@ -1,4 +1,4 @@
-package org.test.transfer.model;
+package org.test.transfer.model.account;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -7,6 +7,11 @@ import org.hibernate.validator.constraints.NotBlank;
 import javax.validation.constraints.Min;
 import java.math.BigDecimal;
 
+/**
+ * Immutable create account request entity with
+ * JSON serialization/deserialization support
+ * and request validation support.
+ */
 public class CreateAccountRequest {
 
     @NotBlank(message = "Name cannot be blank")

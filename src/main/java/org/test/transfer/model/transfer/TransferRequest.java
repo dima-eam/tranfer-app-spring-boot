@@ -1,4 +1,4 @@
-package org.test.transfer.model;
+package org.test.transfer.model.transfer;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -6,28 +6,42 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
+/**
+ * Immutable transfer request request entity with
+ * JSON serialization/deserialization support
+ * and request validation support.
+ */
 @JsonDeserialize(builder = TransferRequest.Builder.class)
 public class TransferRequest {
 
-    @NotNull
-    private final Long from;
-    @NotNull
-    private final Long to;
+    /**
+     * Payer account id
+     */
+    @NotNull(message = "Payer account id cannot be null")
+    private final Long fromId;
+    /**
+     * Payee account id
+     */
+    @NotNull(message = "Payee account id cannot be null")
+    private final Long toId;
+    /**
+     * Transfer amount
+     */
     @Min(0)
     private final BigDecimal amount;
 
-    private TransferRequest(Long from, Long to, BigDecimal amount) {
-        this.from = from;
-        this.to = to;
+    private TransferRequest(Long fromId, Long toId, BigDecimal amount) {
+        this.fromId = fromId;
+        this.toId = toId;
         this.amount = amount;
     }
 
-    public Long getFrom() {
-        return from;
+    public Long getFromId() {
+        return fromId;
     }
 
-    public Long getTo() {
-        return to;
+    public Long getToId() {
+        return toId;
     }
 
     public BigDecimal getAmount() {
@@ -37,12 +51,15 @@ public class TransferRequest {
     @Override
     public String toString() {
         return "TransferRequest{" +
-                "from=" + from +
-                ", to=" + to +
+                "fromId=" + fromId +
+                ", toId=" + toId +
                 ", amount=" + amount +
                 '}';
     }
 
+    /**
+     * Transfer request builder.
+     */
     public static class Builder {
         private Long from;
         private Long to;
