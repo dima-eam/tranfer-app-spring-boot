@@ -29,6 +29,7 @@ public class AccountStorageTest {
     public void testTransferAtomically() throws Exception { // With deadlock, test will never finish
         long from = 1 + random.nextInt(2); // 1 or 2
         long to = from == 1 ? 2 : 1;
+        Thread.sleep(100);
         accountStorage.transferAtomically(from, to, BigDecimal.ONE);
     }
 }
