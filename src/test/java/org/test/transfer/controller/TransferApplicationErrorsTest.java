@@ -5,8 +5,11 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.RequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.junit.Assert.assertEquals;
 
@@ -42,6 +45,8 @@ public class TransferApplicationErrorsTest extends AbstractTransferTest {
         MockHttpServletResponse response = getAccountInfo(null);
 
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        String expected = "{\"shortMessage\":\"Required request body is missing\"}";
+        assertEquals(expected, response.getContentAsString());
     }
 
     @Test
@@ -52,6 +57,20 @@ public class TransferApplicationErrorsTest extends AbstractTransferTest {
         assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
 
         String expected = "{\"errorMessage\":\"Payer account not found\",\"fromAccountDetails\":null,\"toAccountDetails\":null}";
+        assertEquals(expected, response.getContentAsString());
+    }
+
+    @Test
+    public void shouldFailTransferWhenWrongHttpMethodUsed() throws Exception {
+        String request = "{\"from\":\"1\",\"to\":\"2\",\"amount\":\"10.00\"}";
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .get(TRANSFER_PAYMENT_URI).content(request).contentType(MediaType.APPLICATION_JSON_VALUE);
+        MockHttpServletResponse response=makeRequest(requestBuilder);
+
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+
+        String expected = "{\"shortMessage\":\"Request method 'GET' not supported\"}";
         assertEquals(expected, response.getContentAsString());
     }
 

@@ -13,9 +13,9 @@ import javax.annotation.Nullable;
 
 class AbstractTransferTest {
 
-    private static final String CREATE_ACCOUNT_URI = "/app/api/account/create/";
-    private static final String ACCOUNT_INFO_URI = "/app/api/account/info/";
-    private static final String TRANSFER_PAYMENT_URI = "/app/api/transfer/payment";
+    protected static final String CREATE_ACCOUNT_URI = "/app/api/account/create/";
+    protected static final String ACCOUNT_INFO_URI = "/app/api/account/info/";
+    protected static final String TRANSFER_PAYMENT_URI = "/app/api/transfer/payment";
 
     protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -43,7 +43,7 @@ class AbstractTransferTest {
         return makeRequest(requestBuilder);
     }
 
-    private MockHttpServletResponse makeRequest(RequestBuilder requestBuilder) throws Exception {
+    protected MockHttpServletResponse makeRequest(RequestBuilder requestBuilder) throws Exception {
         return mockMvc.perform(requestBuilder).andReturn().getResponse();
     }
 
