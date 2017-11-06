@@ -2,6 +2,7 @@ package org.test.transfer.controller;
 
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 
 import java.util.Optional;
 import java.util.stream.Collectors;

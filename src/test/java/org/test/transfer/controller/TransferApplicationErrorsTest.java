@@ -38,6 +38,13 @@ public class TransferApplicationErrorsTest extends AbstractTransferTest {
     }
 
     @Test
+    public void shouldFailGetAccountWhenNoBody() throws Exception {
+        MockHttpServletResponse response = getAccountInfo(null);
+
+        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+    }
+
+    @Test
     public void shouldFailTransferWhenAccountNotFound() throws Exception {
         String request = "{\"from\":\"1\",\"to\":\"2\",\"amount\":\"10.00\"}";
         MockHttpServletResponse response = transfer(request);

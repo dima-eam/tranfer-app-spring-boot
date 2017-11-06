@@ -13,6 +13,7 @@ import org.test.transfer.model.transfer.TransferDetails;
 import org.test.transfer.model.transfer.TransferRequest;
 import org.test.transfer.service.transfer.impl.TransferServiceImpl;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 
@@ -31,18 +32,18 @@ public class TransferController {
     /**
      * Validates request and process transfer.
      *
-     * @param transferRequest request
-     * @param errors               validation errors collector
+     * @param request request
+     * @param errors  validation errors collector
      * @return result wrapped in ResponseEntity
      */
     @PostMapping("/payment")
-    public ResponseEntity<TransferResult> transfer(@RequestBody @Valid TransferRequest transferRequest,
+    public ResponseEntity<TransferResult> transfer(@RequestBody @Valid TransferRequest request,
                                                    Errors errors) {
         return validate(errors)
                 .map(m -> ResponseEntity.badRequest().body(TransferResult.withErrorMessage(m)))
                 .orElseGet(() -> {
                     try {
-                        TransferDetails transferDetails = transferService.transfer(transferRequest);
+                        TransferDetails transferDetails = transferService.transfer(request);
                         return ResponseEntity.ok(TransferResult.withDetails(transferDetails));
                     } catch (Exception e) {
                         return ResponseEntity.badRequest().body(TransferResult.withErrorMessage(e.getMessage()));
@@ -50,12 +51,24 @@ public class TransferController {
                 });
     }
 
+    /**
+     * Support class for JSON serialization.
+     */
     private static class TransferResult {
 
+        /**
+         * Possible validation error message.
+         */
         @Nullable
         private final String errorMessage;
+        /**
+         * Possible payer account details
+         */
         @Nullable
         private final AccountDetails fromAccountDetails;
+        /**
+         * Possible payee account details
+         */
         @Nullable
         private final AccountDetails toAccountDetails;
 

@@ -29,31 +29,32 @@ public class AccountController {
     /**
      * Validates request and creates new account if possible.
      *
-     * @param createAccountRequest request
-     * @param errors               validation errors collector
+     * @param request request
+     * @param errors  validation errors collector
      * @return result wrapped in ResponseEntity
      */
     @PostMapping("/create")
-    public ResponseEntity<AccountResult> createAccount(@RequestBody @Valid CreateAccountRequest createAccountRequest,
+    public ResponseEntity<AccountResult> createAccount(@RequestBody @Valid CreateAccountRequest request,
                                                        Errors errors) {
-        return validateAndProcess(errors, () -> {
-            AccountDetails accountDetails = accountService.createAccount(createAccountRequest);
-            return ResponseEntity.ok(AccountResult.withDetails(accountDetails));
-        });
+        return validateAndProcess(errors,
+                () -> {
+                    AccountDetails accountDetails = accountService.createAccount(request);
+                    return ResponseEntity.ok(AccountResult.withDetails(accountDetails));
+                });
     }
 
     /**
      * Validates request and return account info if possible.
      *
-     * @param accountInfoRequest request
-     * @param errors             validation errors collector
+     * @param request request
+     * @param errors  validation errors collector
      * @return result wrapped in ResponseEntity
      */
     @GetMapping("/info")
-    public ResponseEntity<AccountResult> getAccountInfo(@RequestBody @Valid AccountInfoRequest accountInfoRequest,
+    public ResponseEntity<AccountResult> getAccountInfo(@RequestBody @Valid AccountInfoRequest request,
                                                         Errors errors) {
-        return validateAndProcess(errors, () ->
-                accountService.getAccountInfo(accountInfoRequest)
+        return validateAndProcess(errors,
+                () -> accountService.getAccountInfo(request)
                         .map(ad -> ResponseEntity.ok(AccountResult.withDetails(ad)))
                         .orElseGet(() -> ResponseEntity.badRequest()
                                 .body(AccountResult.withErrorMessage("Account not found")))

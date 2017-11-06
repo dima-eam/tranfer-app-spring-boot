@@ -6,9 +6,12 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-public class AbstractTransferTest {
+import javax.annotation.Nullable;
+
+class AbstractTransferTest {
 
     private static final String CREATE_ACCOUNT_URI = "/app/api/account/create/";
     private static final String ACCOUNT_INFO_URI = "/app/api/account/info/";
@@ -25,9 +28,12 @@ public class AbstractTransferTest {
         return makeRequest(requestBuilder);
     }
 
-    protected MockHttpServletResponse getAccountInfo(String request) throws Exception {
-        RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .get(ACCOUNT_INFO_URI).content(request).contentType(MediaType.APPLICATION_JSON_VALUE);
+    protected MockHttpServletResponse getAccountInfo(@Nullable String request) throws Exception {
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .get(ACCOUNT_INFO_URI);
+        if (request != null) {
+            requestBuilder.content(request).contentType(MediaType.APPLICATION_JSON_VALUE);
+        }
         return makeRequest(requestBuilder);
     }
 
