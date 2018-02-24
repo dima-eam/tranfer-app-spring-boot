@@ -7,6 +7,7 @@ import org.test.transfer.model.transfer.TransferDetails;
 
 import javax.annotation.Nonnull;
 import java.math.BigDecimal;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -53,6 +54,10 @@ public class AccountStorage implements AccountOperations {
         AccountEntity toAcc = storage.get(toId);
         if (toAcc == null) {
             throw new IllegalArgumentException("Payee account not found");
+        }
+
+        if(Objects.equals(fromId, toId)){
+            throw new IllegalArgumentException("Accounts should be different");
         }
 
         if (fromAcc.balance.compareTo(amount) < 0) {

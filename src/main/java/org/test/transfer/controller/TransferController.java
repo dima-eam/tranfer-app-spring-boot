@@ -11,9 +11,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.test.transfer.model.account.AccountDetails;
 import org.test.transfer.model.transfer.TransferDetails;
 import org.test.transfer.model.transfer.TransferRequest;
-import org.test.transfer.service.transfer.impl.TransferServiceImpl;
+import org.test.transfer.service.transfer.TransferService;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 
@@ -27,7 +26,7 @@ import static org.test.transfer.controller.ErrorsHelper.validate;
 public class TransferController {
 
     @Autowired
-    private TransferServiceImpl transferService;
+    private TransferService transferService;
 
     /**
      * Validates request and process transfer.
