@@ -1,8 +1,11 @@
 package org.test.transfer.controller;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,12 +24,17 @@ import static org.test.transfer.controller.ErrorsHelper.validate;
 /**
  * Transfer operations controller. Returns {@link ResponseEntity} with JSON payload.
  */
+@Api("Transfer operations controller")
 @RestController
 @RequestMapping("/app/api/transfer")
 public class TransferController {
 
+    private final TransferService transferService;
+
     @Autowired
-    private TransferService transferService;
+    public TransferController(TransferService transferService) {
+        this.transferService = transferService;
+    }
 
     /**
      * Validates request and process transfer.
@@ -36,6 +44,7 @@ public class TransferController {
      * @return result wrapped in ResponseEntity
      */
     @PostMapping("/payment")
+    @PreAuthorize("#oauth2.hasScope('read')")
     public ResponseEntity<TransferResult> transfer(@RequestBody @Valid TransferRequest request,
                                                    Errors errors) {
         return validate(errors)

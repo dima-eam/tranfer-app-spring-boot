@@ -1,6 +1,8 @@
 package org.test.transfer.model.transfer;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
@@ -11,12 +13,14 @@ import java.math.BigDecimal;
  * JSON serialization/deserialization support
  * and request validation support.
  */
+@ApiModel(description = "Immutable transfer request request entity")
 @JsonDeserialize(builder = TransferRequest.Builder.class)
 public class TransferRequest {
 
     /**
      * Payer account id
      */
+    @ApiModelProperty(required = true, example = "1")
     @NotNull(message = "Payer account id cannot be null")
     private final Long fromId;
     /**

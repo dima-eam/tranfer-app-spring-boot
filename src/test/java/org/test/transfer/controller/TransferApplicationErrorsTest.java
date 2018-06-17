@@ -1,21 +1,11 @@
 package org.test.transfer.controller;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.RequestBuilder;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.testng.annotations.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.testng.Assert.assertEquals;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureMockMvc
 public class TransferApplicationErrorsTest extends AbstractTransferTest {
 
     @Test
@@ -23,10 +13,10 @@ public class TransferApplicationErrorsTest extends AbstractTransferTest {
         String request = "{\"name\":\"test1\",\"balance\":\"-10\"}";
         MockHttpServletResponse response = createAccount(request);
 
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
 
         String expected = "{\"errorMessage\":\"Balance cannot be negative\",\"accountDetails\":null}";
-        assertEquals(expected, response.getContentAsString());
+        assertEquals(response.getContentAsString(), expected);
     }
 
     @Test
@@ -34,19 +24,19 @@ public class TransferApplicationErrorsTest extends AbstractTransferTest {
         String request = "{\"id\":\"1\"}";
         MockHttpServletResponse response = getAccountInfo(request);
 
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
 
         String expected = "{\"errorMessage\":\"Account not found\",\"accountDetails\":null}";
-        assertEquals(expected, response.getContentAsString());
+        assertEquals(response.getContentAsString(), expected);
     }
 
     @Test
     public void shouldFailGetAccountWhenNoBody() throws Exception {
         MockHttpServletResponse response = getAccountInfo(null);
 
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
         String expected = "{\"shortMessage\":\"Required request body is missing\"}";
-        assertEquals(expected, response.getContentAsString());
+        assertEquals(response.getContentAsString(), expected);
     }
 
     @Test
@@ -54,24 +44,46 @@ public class TransferApplicationErrorsTest extends AbstractTransferTest {
         String request = "{\"from\":\"1\",\"to\":\"2\",\"amount\":\"10.00\"}";
         MockHttpServletResponse response = transfer(request);
 
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
 
         String expected = "{\"errorMessage\":\"Payer account not found\",\"fromAccountDetails\":null,\"toAccountDetails\":null}";
-        assertEquals(expected, response.getContentAsString());
+        assertEquals(response.getContentAsString(), expected);
     }
 
     @Test
     public void shouldFailTransferWhenWrongHttpMethodUsed() throws Exception {
         String request = "{\"from\":\"1\",\"to\":\"2\",\"amount\":\"10.00\"}";
 
-        RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .get(TRANSFER_PAYMENT_URI).content(request).contentType(MediaType.APPLICATION_JSON_VALUE);
-        MockHttpServletResponse response=makeRequest(requestBuilder);
+        MockHttpServletResponse response = transfer(request, getAuthorizedBuilder(TRANSFER_PAYMENT_URI));
 
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
 
         String expected = "{\"shortMessage\":\"Request method 'GET' not supported\"}";
-        assertEquals(expected, response.getContentAsString());
+        assertEquals(response.getContentAsString(), expected);
+    }
+
+    @Test
+    public void shouldFailTransferWhenEqualAccounts() throws Exception {
+        String request = "{\"from\":\"1\",\"to\":\"1\",\"amount\":\"10.00\"}";
+
+        MockHttpServletResponse response = transfer(request);
+
+        assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
+
+        String expected = "{\"errorMessage\":\"Accounts should be different\",\"fromAccountDetails\":null,\"toAccountDetails\":null}";
+        assertEquals(response.getContentAsString(), expected);
+    }
+
+//    @Test
+    public void shouldFailTransferWhenWrongUser() throws Exception {
+        String request = "{\"from\":\"1\",\"to\":\"1\",\"amount\":\"10.00\"}";
+
+        MockHttpServletResponse response = transfer(request, "another");
+
+        assertEquals(response.getStatus(), HttpStatus.UNAUTHORIZED.value());
+
+        String expected = "{\"errorMessage\":\"Accounts should be different\",\"fromAccountDetails\":null,\"toAccountDetails\":null}";
+        assertEquals(response.getContentAsString(), expected);
     }
 
 }

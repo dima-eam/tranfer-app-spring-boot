@@ -23,8 +23,11 @@ import static org.test.transfer.controller.ErrorsHelper.validate;
 @RequestMapping("/app/api/account")
 public class AccountController {
 
-    @Autowired
-    private AccountService accountService;
+    private final AccountService accountService;
+
+    public AccountController(AccountService accountService) {
+        this.accountService = accountService;
+    }
 
     /**
      * Validates request and creates new account if possible.

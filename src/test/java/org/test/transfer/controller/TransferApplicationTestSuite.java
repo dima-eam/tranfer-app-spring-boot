@@ -1,21 +1,16 @@
 package org.test.transfer.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.testng.annotations.Test;
 
 import java.math.BigDecimal;
 
-import static org.junit.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
-@AutoConfigureMockMvc
 public class TransferApplicationTestSuite extends AbstractTransferTest {
 
     @Test
@@ -37,7 +32,7 @@ public class TransferApplicationTestSuite extends AbstractTransferTest {
         String request = String.format("{\"name\":\"%s\",\"balance\":\"%s\"}", name, balance.toPlainString());
         MockHttpServletResponse response = createAccount(request);
 
-        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertEquals(response.getStatus(), HttpStatus.OK.value());
         JsonNode jsonNode = OBJECT_MAPPER.reader().readTree(response.getContentAsString());
         assertTrue(jsonNode.findValue("errorMessage").isNull());
         assertFalse(jsonNode.findValue("accountDetails").isNull());
@@ -48,14 +43,14 @@ public class TransferApplicationTestSuite extends AbstractTransferTest {
         String request = String.format("{\"from\":\"%d\",\"to\":\"%d\",\"amount\":\"%s\"}", from, to, amount.toPlainString());
         MockHttpServletResponse response = transfer(request);
 
-        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertEquals(response.getStatus(), HttpStatus.OK.value());
     }
 
     private void shouldFailTransferWhenInsufficientFunds(Long from, Long to, BigDecimal amount) throws Exception {
         String request = String.format("{\"from\":\"%d\",\"to\":\"%d\",\"amount\":\"%s\"}", from, to, amount.toPlainString());
         MockHttpServletResponse response = transfer(request);
 
-        assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        assertEquals(response.getStatus(), HttpStatus.BAD_REQUEST.value());
         JsonNode jsonNode = OBJECT_MAPPER.reader().readTree(response.getContentAsString());
         assertFalse(jsonNode.findValue("errorMessage").isNull());
         assertTrue("Insufficient funds".equals(jsonNode.findValue("errorMessage").asText()));
@@ -65,7 +60,7 @@ public class TransferApplicationTestSuite extends AbstractTransferTest {
         String request = String.format("{\"id\":\"%d\"}", from);
         MockHttpServletResponse response = getAccountInfo(request);
 
-        assertEquals(HttpStatus.OK.value(), response.getStatus());
+        assertEquals(response.getStatus(), HttpStatus.OK.value());
         JsonNode jsonNode = OBJECT_MAPPER.reader().readTree(response.getContentAsString());
         assertTrue(jsonNode.findValue("errorMessage").isNull());
         assertFalse(jsonNode.findValue("accountDetails").isNull());
