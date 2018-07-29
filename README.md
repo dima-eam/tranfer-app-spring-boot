@@ -14,8 +14,8 @@ This application build with Maven (so you need it). To make a test:
     
 TODOs
 -
-1. Add Dockerfile
-2. Add another module and reactive streams
+1. Add Dockerfile and docker-compose
+2. Add Kafka producer/consumer
 3. Add integration tests for services
 4. https endpoint (separate configs and props)
 5. jmh module
