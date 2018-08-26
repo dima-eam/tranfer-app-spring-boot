@@ -26,11 +26,11 @@
     <modules>
         <module>transfer-service</module>
         <module>transfer-consumer</module>
+        <module>transfer-bench</module>
     </modules>
 
     <dependencyManagement>
         <dependencies>
-
             <dependency>
                 <groupId>org.springframework.security.oauth</groupId>
                 <artifactId>spring-security-oauth2</artifactId>
@@ -62,6 +62,17 @@
                 <version>2.7.0</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-core</artifactId>
+                <version>1.19</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-generator-annprocess</artifactId>
+                <version>1.19</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -24,10 +25,10 @@ public class AccountStorage implements AccountOperations {
     private static final Logger logger = LoggerFactory.getLogger(AccountStorage.class);
 
     /**
-     * There is no need to use ConcurrentMap, due to no read contentions:
-     * keys are not deleted and read-modify-write operations are synchronized
+     * Adding new account and get account info operations rely on ConcurrentHashMap implementation,
+     * but atomic transfer requires additional locking
      */
-    private final Map<Long, AccountEntity> storage = new HashMap<>();
+    private final Map<Long, AccountEntity> storage = new ConcurrentHashMap<>();
     private final AtomicLong idGenerator = new AtomicLong(0);
 
     private final Object lock = new Object();
@@ -42,7 +43,7 @@ public class AccountStorage implements AccountOperations {
     @Override
     public AccountDetails store(String name, BigDecimal balance) {
         AccountEntity accountEntity = new AccountEntity(newId(), name, balance);
-        storage.put(accountEntity.id, accountEntity);
+        storage.putIfAbsent(accountEntity.id, accountEntity);
         return new AccountDetails(accountEntity.id, accountEntity.balance);
     }
 
@@ -91,8 +92,10 @@ public class AccountStorage implements AccountOperations {
 
     @Override
     public Optional<AccountDetails> getAccount(Long id) {
-        return Optional.ofNullable(storage.get(id))
-                .map(e -> new AccountDetails(e.id, e.balance));
+        synchronized (lock) {
+            return Optional.ofNullable(storage.get(id))
+                    .map(e -> new AccountDetails(e.id, e.balance));
+        }
     }
 
     private Long newId() {
