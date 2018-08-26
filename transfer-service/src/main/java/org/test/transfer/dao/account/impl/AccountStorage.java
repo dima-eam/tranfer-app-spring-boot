@@ -92,10 +92,8 @@ public class AccountStorage implements AccountOperations {
 
     @Override
     public Optional<AccountDetails> getAccount(Long id) {
-        synchronized (lock) {
-            return Optional.ofNullable(storage.get(id))
-                    .map(e -> new AccountDetails(e.id, e.balance));
-        }
+        return Optional.ofNullable(storage.get(id))
+                .map(e -> new AccountDetails(e.id, e.balance));
     }
 
     private Long newId() {
