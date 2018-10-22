@@ -14,6 +14,7 @@ This application build with Maven (so you need it). To make a test:
     
 TODOs
 -
+0. enable oauth by config (conditional)
 1. Add Dockerfile and docker-compose
 2. Add Kafka producer/consumer
 3. Add integration tests for services

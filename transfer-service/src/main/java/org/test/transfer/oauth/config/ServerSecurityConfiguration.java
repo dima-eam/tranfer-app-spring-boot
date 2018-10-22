@@ -21,12 +21,10 @@ public class ServerSecurityConfiguration extends WebSecurityConfigurerAdapter {
         web.ignoring().antMatchers("/swagger/**"); // todo
     }
 
-    @Override
-    @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
-
+    /**
+     * Defines which auth methods applied to application (basic, form login)
+     * and user to URL mappings
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
@@ -35,6 +33,18 @@ public class ServerSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/**").hasRole("USER").and().httpBasic();
     }
 
+    /**
+     * Override auth manager with our own user details service
+     */
+    @Override
+    @Bean
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
+
+    /**
+     * Defines application user stores
+     */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
